@@ -4,23 +4,11 @@
 #include <math.h>
 #include <time.h>
 
-typedef struct station{
+typedef struct arbre{
     int identifiant;
     int idcentrale;
-    int capacite;
-    int consommation;
-    int somme;
-}Station;
-
-typedef struct consommateur{
-    int identifiant;
-    Station d;
-    int consommation;
-    int somme;
-}Consommateur;
-
-typedef struct Arbre{
-    Station c;
+    long long capacite;
+    long long consommation;
     struct station* fg;
     struct station* fd;
     int equilibre;
@@ -31,17 +19,18 @@ typedef struct Arbre{
 //fonction somme pour calculer tout les noeud de l'arbre'
 // fonction pour recuperer info sur fichoer
 
-Arbre *creationArbre(station *e){
+Arbre *creationArbre(int identifiant, int idcentrale, long long capacité,long long consommation ){
     Arbre *d=malloc(sizeof(Arbre));
     if(d==NULL){
-        exit(ERREUR);
+        exit(3);
     }
-    d->c->identifiant=e->identifiant;
-    d->c->capacite=e->capacite;
-    d->c->somme=0;
+    d->identifiant=identifiant;
+    d->idcentrale=idcentrale;
+    d->capacite=capacité;
+    d->consommation=consommation;
     d->fg=NULL;
     d->fd=NULL;
-    d->equilinbre=0;
+    d->equilibre=0;
     return d;
 }
 
@@ -52,8 +41,8 @@ int min(int a, int b){
     return (a<b)?a:b;
 }
 
-Arbre * rotationgauche(Arbre **a){
-    Arbre**pivot=a->fd;
+Arbre * rotationgauche(Arbre *a){
+    Arbre*pivot=a->fd;
     int eq_a=a->equilibre,eq_p=pivot->equilibre;
     a->fd=pivot->fg;
     pivot->fg=a;
@@ -63,8 +52,8 @@ Arbre * rotationgauche(Arbre **a){
     return a;
 }
 
-Arbre * rotationdroite(Arbre **a){
-    Arbre**pivot=a->fg;
+Arbre * rotationdroite(Arbre *a){
+    Arbre *pivot=a->fg;
     int eq_a=a->equilibre,eq_p=pivot->equilibre;
     a->fg=pivot->fd;
     pivot->fd=a;
@@ -103,7 +92,7 @@ Arbre* equilibrage(Arbre *a){
     return a;
 }
 
-Arbre *insertionArbre(Arbre **a, Station*e) {
+Arbre *insertionArbre(Arbre *a, Station*e) {
     int *h;
     if (a == NULL) {
         *h = 1;
@@ -133,13 +122,13 @@ Arbre *insertionArbre(Arbre **a, Station*e) {
 Arbre* recuperationfichier( char * nomfichier){
     FILE *fichier=fopen(nomfichier,"r");
     if(fichier ==NULL){
-        exit(FICHIERINEXISTANT);
+        exit(2);
     }
     Arbre *f;
 
     if(f==NULL){
         fclose(fichier);
-        exit(ERREUR);
+        exit(2);
     }
     char ligne[200];
     while(fgets(ligne,199,fichier)){
