@@ -9,8 +9,8 @@ typedef struct arbre{
     int idcentrale;
     long long capacite;
     long long consommation;
-    struct station* fg;
-    struct station* fd;
+    struct arbre* fg;
+    struct arbre* fd;
     int equilibre;
 }Arbre;
 
@@ -19,18 +19,18 @@ typedef struct arbre{
 //fonction somme pour calculer tout les noeud de l'arbre'
 // fonction pour recuperer info sur fichoer
 
-Arbre *creationArbre(int identifiant, int idcentrale, long long capacité,long long consommation ){
+Arbre *creationArbre(int identifiant , long long capacite){
     Arbre *d=malloc(sizeof(Arbre));
     if(d==NULL){
-        exit(3);
+        exit(2);
     }
     d->identifiant=identifiant;
-    d->idcentrale=idcentrale;
-    d->capacite=capacité;
-    d->consommation=consommation;
+    d->capacite=capacite;
     d->fg=NULL;
     d->fd=NULL;
     d->equilibre=0;
+    d->consommation=0;
+    d->idcentrale=0;
     return d;
 }
 
@@ -92,16 +92,17 @@ Arbre* equilibrage(Arbre *a){
     return a;
 }
 
-Arbre *insertionArbre(Arbre *a, Station*e) {
-    int *h;
+//inserer les capacitées et les identifiants dans l'arbre
+
+Arbre *insertionArbre(Arbre *a, int id, long long capacite, int* h){
     if (a == NULL) {
         *h = 1;
-        return creationArbre(e);
-    } else if (e->capacite < a->c.capacite) {
-        a->fg = insertionArbre(a->fg, e);
+        return creationArbre(id,capacite);
+    } else if (id < a->identifiant) {
+        a->fg = insertionArbre(a->fg,id,capacite,h);
         *h = -*h;
-    } else if (e->capacite > a->c.capacite) {
-        a->fd = insertionArbre(a->fd, e);
+    } else if (id > a->identifiant) {
+        a->fd = insertionArbre(a->fd,id,capacite,h);
     } else {
         *h = 0;
         return a;
@@ -139,6 +140,7 @@ Arbre* recuperationfichier( char * nomfichier){
     fclose(fichier);
     return f;
 }
+
 
 int main() {
     printf("Hello, World!\n");
