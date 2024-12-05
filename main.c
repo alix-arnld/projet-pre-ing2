@@ -8,8 +8,16 @@ typedef struct station{
     int identifiant;
     int idcentrale;
     int capacite;
+    int consommation;
     int somme;
 }Station;
+
+typedef struct consommateur{
+    int identifiant;
+    Station d;
+    int consommation;
+    int somme;
+}Consommateur;
 
 typedef struct Arbre{
     Station c;
@@ -128,13 +136,14 @@ Arbre* recuperationfichier( char * nomfichier){
         exit(FICHIERINEXISTANT);
     }
     Arbre *f;
+
     if(f==NULL){
         fclose(fichier);
         exit(ERREUR);
     }
     char ligne[200];
     while(fgets(ligne,199,fichier)){
-        if(sscanf(ligne, "%d;%d;%d",f->c->idcentrale,f->c->identifiant,f->c->capacite)){
+        if(sscanf(ligne, "%d;%d;%d;%d",f->c->idcentrale,f->c->identifiant,f->c->capacite)){
             insertionArbre(f,f->c);
         }
     }
