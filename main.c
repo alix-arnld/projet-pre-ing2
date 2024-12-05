@@ -37,8 +37,15 @@ Arbre *creationArbre(station *e){
     return d;
 }
 
+int max(int a, int b){
+    return (a>b)?a:b;
+}
+int min(int a, int b){
+    return (a<b)?a:b;
+}
+
 Arbre * rotationgauche(Arbre **a){
-    Arbre*pivot=a->fd;
+    Arbre**pivot=a->fd;
     int eq_a=a->equilibre,eq_p=pivot->equilibre;
     a->fd=pivot->fg;
     pivot->fg=a;
@@ -49,7 +56,7 @@ Arbre * rotationgauche(Arbre **a){
 }
 
 Arbre * rotationdroite(Arbre **a){
-    Arbre*pivot=a->fg;
+    Arbre**pivot=a->fg;
     int eq_a=a->equilibre,eq_p=pivot->equilibre;
     a->fg=pivot->fd;
     pivot->fd=a;
