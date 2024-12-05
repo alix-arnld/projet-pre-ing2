@@ -37,7 +37,58 @@ Arbre *creationArbre(station *e){
     return d;
 }
 
-Arbre *insertionArbre(Arbre *a, Station*e) {
+Arbre * rotationgauche(Arbre **a){
+    Arbre*pivot=a->fd;
+    int eq_a=a->equilibre,eq_p=pivot->equilibre;
+    a->fd=pivot->fg;
+    pivot->fg=a;
+    a->equilibre=eq_a-max(eq_p,0)-1;
+    pivot->equilibre=min(min(eq_a-2,eq_p+eq_p-2),eq_p-1);
+    a=pivot;
+    return a;
+}
+
+Arbre * rotationdroite(Arbre **a){
+    Arbre*pivot=a->fg;
+    int eq_a=a->equilibre,eq_p=pivot->equilibre;
+    a->fg=pivot->fd;
+    pivot->fd=a;
+    a->equilibre=eq_a-min(eq_p,0)+1;
+    pivot->equilibre=max(max(eq_a+2,eq_a+eq_p+2),eq_p+1);
+    a=pivot;
+    return a;
+}
+
+Arbre* doublerotationgauche(Arbre *a){
+    a->fd= rotationdroite(a->fd);
+    return rotationgauche(a);
+}
+
+Arbre*doublerotationdroite(Arbre*a){
+    a->fg= rotationgauche(a->fg);
+    return rotationdroite(a);
+}
+
+Arbre* equilibrage(Arbre *a){
+    if(a->equilibre>=2) {
+        if (a->fd >= 0) {
+            return rotationgauche(a);
+        } else {
+            return doublerotationgauche(a);
+        }
+    }
+    if(a->equilibre<=2){
+        if(a->fd<=0){
+            return rotationdroite(a);
+        }
+        else{
+            return doublerotationdroite(a);
+        }
+    }
+    return a;
+}
+
+Arbre *insertionArbre(Arbre **a, Station*e) {
     int *h;
     if (a == NULL) {
         *h = 1;
