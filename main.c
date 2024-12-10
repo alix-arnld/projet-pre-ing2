@@ -141,6 +141,17 @@ Arbre* recuperationfichier( char * nomfichier){
     return f;
 }
 
+//Une fonction qui additionne la consonsommation des consommateurs en faisant un parcour infixe
+int sommeconsommation(Arbre* a){
+    int k=0;
+    if(a==NULL){
+        exit(2);
+    }
+    sommeconsommation(a->fg);
+    k=k+a->consommation;
+    sommeconsommation(a->fd);
+    return k;
+}
 
 int main() {
     printf("Hello, World!\n");
