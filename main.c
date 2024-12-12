@@ -11,6 +11,14 @@ typedef struct arbre{
     long long consommation;
     struct arbre* fg;
     struct arbre* fd;
+    int somme;
+}Station;
+
+
+typedef struct Arbre{
+    Station c;
+    struct station* fg;
+    struct station* fd;
     int equilibre;
 }Arbre;
 
@@ -53,7 +61,9 @@ Arbre * rotationgauche(Arbre *a){
 }
 
 Arbre * rotationdroite(Arbre *a){
+
     Arbre *pivot=a->fg;
+    Arbre*pivot=a->fg;
     int eq_a=a->equilibre,eq_p=pivot->equilibre;
     a->fg=pivot->fd;
     pivot->fd=a;
@@ -172,7 +182,12 @@ Arbre* recuperationfichier( char * nomfichier, char *type, char *consommateur){
     }
     char ligne[200];
     while(fscanf(file,"%d;%[^;];%[^;];%[^;];%[^;];%[^;];%lld",f-> )==2){
-        if(fscanf(ligne, ";%d;%d;%d",f->c->id,f->c->identifiant,f->c->capacite)){
+        if(fscanf(ligne, ";%d;%d;%d",f->c->id,f->c->identifiant,f->c->capacite)) {
+        }
+    }
+
+    while(fgets(ligne,199,fichier)){
+        if(sscanf(ligne, "%d;%d;%d;%d",f->c->idcentrale,f->c->identifiant,f->c->capacite)){
             insertionArbre(f,f->c);
         }
     }
