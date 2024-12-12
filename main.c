@@ -136,7 +136,7 @@ void ajoutconsommation(Arbre *a, long long k, int id){
         ajoutconsommation(a->fd,k,id);
     }
     if(id==a->c->identifiant){
-        a->consommation+=k;
+        a->c->consommation+=k;
     }
 }
 
@@ -197,7 +197,7 @@ int sommeconsommation(Arbre* a){
         exit(2);
     }
     sommeconsommation(a->fg);
-    k=k+a->consommation;
+    k+=a->c->consommation;
     sommeconsommation(a->fd);
     return k;
 }
