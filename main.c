@@ -120,7 +120,46 @@ Arbre *insertionArbre(Arbre *a, int id, long long capacite, int* h){
     return a;
 }
 
-Arbre* recuperationfichier( char * nomfichier){
+void ajoutconsommation(Arbre *a, long long k, int id){
+    if(a==NULL){
+        return;
+    }
+    if(id<a->identifiant){
+        ajoutconsommation(a->fg,k,id);
+    }
+    if(id>a->identifiant){
+        ajoutconsommation(a->fd,k,id);
+    }
+    if(id==a->identifiant){
+        a->consommation+=k;
+    }
+}
+
+void recuperationconsommation(Arbre*a, char *type){//type est la sattion hvb ou hva ou lv, on la rentre dans le main
+    FILE *fichier=fopen(donnees_filtrees.csv,"r");
+    if(fichier ==NULL){
+        exit(2);
+    }
+    int id_temporaire = 0;
+    long long k = 0;
+    if(strcmp(type,"hvb")==0){
+        while (fscanf(fichier,"%[^;];%d;%[^;];%[^;];%[^;];%[^;];%[^;];%lld",&id_temporaire,&k) == 2){
+            ajoutconsommation(a,k,id_temporaire);
+        }
+    }
+    if(strcmp(type,"hva")==0){
+        while (fscanf(fichier,"%[^;];%[^;];%d;%[^;];%[^;];%[^;];%[^;];%lld",&id_temporaire,&k) == 2){
+            ajoutconsommation(a,k,id_temporaire);
+        }
+    }
+    if(strcmp(type,"lv")==0){
+        while (fscanf(fichier,"%[^;];%[^;];%[^;];%d;%[^;];%[^;];%[^;];%lld",&id_temporaire,&k) == 2){
+            ajoutconsommation(a,k,id_temporaire);
+        }
+    }
+}
+
+Arbre* recuperationfichier( char * nomfichier, char *type, char *consommateur){
     FILE *fichier=fopen(nomfichier,"r");
     if(fichier ==NULL){
         exit(2);
@@ -132,8 +171,8 @@ Arbre* recuperationfichier( char * nomfichier){
         exit(2);
     }
     char ligne[200];
-    while(fgets(ligne,199,fichier)){
-        if(sscanf(ligne, "%d;%d;%d;%d",f->c->idcentrale,f->c->identifiant,f->c->capacite)){
+    while(fscanf(file,"%d;%[^;];%[^;];%[^;];%[^;];%[^;];%lld",f-> )==2){
+        if(fscanf(ligne, ";%d;%d;%d",f->c->id,f->c->identifiant,f->c->capacite)){
             insertionArbre(f,f->c);
         }
     }
@@ -153,7 +192,7 @@ int sommeconsommation(Arbre* a){
     return k;
 }
 
-int main() {
+int main(char **argv) {
     printf("Hello, World!\n");
     return 0;
 }
