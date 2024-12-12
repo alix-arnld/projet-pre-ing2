@@ -4,14 +4,10 @@
 #include <math.h>
 #include <time.h>
 
-typedef struct arbre{
+typedef struct station{
     int identifiant;
-    int idcentrale;
     long long capacite;
     long long consommation;
-    struct arbre* fg;
-    struct arbre* fd;
-    int somme;
 }Station;
 
 
@@ -32,13 +28,12 @@ Arbre *creationArbre(int identifiant , long long capacite){
     if(d==NULL){
         exit(2);
     }
-    d->identifiant=identifiant;
-    d->capacite=capacite;
+    d->c->identifiant=identifiant;
+    d->c->capacite=capacite;
     d->fg=NULL;
     d->fd=NULL;
     d->equilibre=0;
-    d->consommation=0;
-    d->idcentrale=0;
+    d->c->consommation=0;
     return d;
 }
 
@@ -108,10 +103,10 @@ Arbre *insertionArbre(Arbre *a, int id, long long capacite, int* h){
     if (a == NULL) {
         *h = 1;
         return creationArbre(id,capacite);
-    } else if (id < a->identifiant) {
+    } else if (id < a->c->identifiant) {
         a->fg = insertionArbre(a->fg,id,capacite,h);
         *h = -*h;
-    } else if (id > a->identifiant) {
+    } else if (id > a->c->identifiant) {
         a->fd = insertionArbre(a->fd,id,capacite,h);
     } else {
         *h = 0;
@@ -134,13 +129,13 @@ void ajoutconsommation(Arbre *a, long long k, int id){
     if(a==NULL){
         return;
     }
-    if(id<a->identifiant){
+    if(id<a->c->identifiant){
         ajoutconsommation(a->fg,k,id);
     }
-    if(id>a->identifiant){
+    if(id>a->c->identifiant){
         ajoutconsommation(a->fd,k,id);
     }
-    if(id==a->identifiant){
+    if(id==a->c->identifiant){
         a->consommation+=k;
     }
 }
