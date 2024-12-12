@@ -8,6 +8,7 @@ typedef struct station{
     int identifiant;
     long long capacite;
     long long consommation;
+    long long analyse;
 }Station;
 
 
@@ -191,15 +192,89 @@ Arbre* recuperationfichier( char * nomfichier, char *type, char *consommateur){
 }
 
 //Une fonction qui additionne la consonsommation des consommateurs en faisant un parcour infixe
-int sommeconsommation(Arbre* a){
-    int k=0;
+ void sommeconsommation(Arbre* a){
+
     if(a==NULL){
         exit(2);
     }
     sommeconsommation(a->fg);
-    k+=a->c->consommation;
+    a->c->analyse= (a->c.capacite - a->c.consommation);
     sommeconsommation(a->fd);
-    return k;
+}
+
+void creationfichieranalyse(Arbre *a, char *type, char * pareil){
+    if(strcmp(type,"hvb")==0){
+        FILE *hvb = fopen("hvb_comp.csv", "w");
+        if (hvb == NULL) {
+            exit(1);
+        }
+        printf("station;capacité;consommation totale des consommateurs;analyse de la comsommation");
+        fprintf("%d;%lld;%lld;%lld",a->c.identifiant,a->c.capacite,a->c.consommation,a->c.analyse);
+        if(a->fg!=NULL){
+            creationfichieranalyse(a->fg, type,pareil);
+        }
+        if(a->fd!=NULL){
+            creationfichieranalyse(a->fd, type,pareil);
+        }
+    }
+    if(strcmp(type,"hva")==0){
+        FILE *hva = fopen("hva_comp.csv", "w");
+        if (hva == NULL) {
+            exit(1);
+        }
+        printf("station;capacité;consommation totale des consommateurs;analyse de la comsommation");
+        fprintf("%d;%lld;%lld;%lld",a->c.identifiant,a->c.capacite,a->c.consommation,a->c.analyse);
+        if(a->fg!=NULL){
+            creationfichieranalyse(a->fg, type,pareil);
+        }
+        if(a->fd!=NULL){
+            creationfichieranalyse(a->fd, type,pareil);
+        }
+    }
+    if(strcmp(type,"lv")==0){
+        if(strcmp(pareil,"comp")==0){
+            FILE *lv = fopen("lv_comp.csv", "w");
+            if (lv == NULL) {
+                exit(1);
+            }
+            printf("station;capacité;consommation totale des consommateurs;analyse de la comsommation");
+            fprintf("%d;%lld;%lld;%lld",a->c.identifiant,a->c.capacite,a->c.consommation,a->c.analyse);
+            if(a->fg!=NULL){
+                creationfichieranalyse(a->fg, type,pareil);
+            }
+            if(a->fd!=NULL){
+                creationfichieranalyse(a->fd, type,pareil);
+            }
+        }
+        if(strcmp(pareil,"indiv")==0) {
+            FILE *lv = fopen("lv_indiv.csv", "w");
+            if (lv == NULL) {
+                exit(1);
+            }
+            printf("station;capacité;consommation totale des consommateurs;analyse de la comsommation");
+            fprintf("%d;%lld;%lld;%lld",a->c.identifiant,a->c.capacite,a->c.consommation,a->c.analyse);
+            if(a->fg!=NULL){
+                creationfichieranalyse(a->fg, type,pareil);
+            }
+            if(a->fd!=NULL){
+                creationfichieranalyse(a->fd, type,pareil);
+            }
+        }
+        if(strcmp(pareil,"all")==0) {
+            FILE *lv = fopen("lv_all.csv", "w");
+            if (lv == NULL) {
+                exit(1);
+            }
+            printf("station;capacité;consommation totale des consommateurs;analyse de la comsommation");
+            fprintf("%d;%lld;%lld;%lld",a->c.identifiant,a->c.capacite,a->c.consommation,a->c.analyse);
+            if(a->fg!=NULL){
+                creationfichieranalyse(a->fg, type,pareil);
+            }
+            if(a->fd!=NULL){
+                creationfichieranalyse(a->fd, type,pareil);
+            }
+        }
+    }
 }
 
 int main(char **argv) {
