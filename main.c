@@ -126,6 +126,7 @@ Arbre *insertionArbre(Arbre *a, int id, long long capacite, int* h){
     return a;
 }
 
+//procédure de recherche à partir des identifiants de la station pour ajouter la consommation du consommateur à celle totale
 void ajoutconsommation(Arbre *a, long long k, int id){
     if(a==NULL){
         return;
@@ -141,7 +142,8 @@ void ajoutconsommation(Arbre *a, long long k, int id){
     }
 }
 
-void recuperationconsommation(Arbre*a, char *type){//type est la sattion hvb ou hva ou lv, on la rentre dans le main
+//procédure qui lit les données filtrées depuis un fichier CSV en fonction d'un type donné et met à jour la consommation totale en y ajoutant les consommations associées aux consommateurs
+void recuperationconsommation(Arbre*a, char *type){
     FILE *fichier=fopen(donnees_filtrees.csv,"r");
     if(fichier ==NULL){
         exit(2);
@@ -165,20 +167,19 @@ void recuperationconsommation(Arbre*a, char *type){//type est la sattion hvb ou 
     }
 }
 
-Arbre* recuperationfichier( char * nomfichier, char *type, char *consommateur){
+//
+Arbre* recuperationfichier( Arbre* f,char * nomfichier, char *type, char *consommateur){
     FILE *fichier=fopen(nomfichier,"r");
     if(fichier ==NULL){
         exit(2);
     }
-    Arbre *f;
-
     if(f==NULL){
         fclose(fichier);
         exit(2);
     }
-    char ligne[200];
-    while(fscanf(file,"%d;%[^;];%[^;];%[^;];%[^;];%[^;];%lld",f-> )==2){
-        if(fscanf(ligne, ";%d;%d;%d",f->c->id,f->c->identifiant,f->c->capacite)) {
+
+    while(fscanf(file,"%d;%[^;];%[^;];%[^;];%[^;];%[^;];%lld",f->c->id,f->c->identifiant,f->c->capacite)==2){
+
         }
     }
 
@@ -191,7 +192,7 @@ Arbre* recuperationfichier( char * nomfichier, char *type, char *consommateur){
     return f;
 }
 
-//Une fonction qui additionne la consonsommation des consommateurs en faisant un parcour infixe
+//Une procédure qui calcule la différence entre la capacité d'une station et la consommation des consommateurs avec un parcours infixe
  void sommeconsommation(Arbre* a){
 
     if(a==NULL){
@@ -202,14 +203,15 @@ Arbre* recuperationfichier( char * nomfichier, char *type, char *consommateur){
     sommeconsommation(a->fd);
 }
 
+//procédure qui va créer les fichiers avec les données de surproduction ou non de chaque station en fonction de ce que l'utilisateur aura demandé
 void creationfichieranalyse(Arbre *a, char *type, char * pareil){
     if(strcmp(type,"hvb")==0){
         FILE *hvb = fopen("hvb_comp.csv", "w");
         if (hvb == NULL) {
             exit(1);
         }
-        printf("station;capacité;consommation totale des consommateurs;analyse de la comsommation");
-        fprintf("%d;%lld;%lld;%lld",a->c.identifiant,a->c.capacite,a->c.consommation,a->c.analyse);
+        printf("station:capacité:consommation totale des consommateurs:analyse de la comsommation");
+        fprintf("%d:%lld:%lld:%lld",a->c.identifiant,a->c.capacite,a->c.consommation,a->c.analyse);
         if(a->fg!=NULL){
             creationfichieranalyse(a->fg, type,pareil);
         }
@@ -222,8 +224,8 @@ void creationfichieranalyse(Arbre *a, char *type, char * pareil){
         if (hva == NULL) {
             exit(1);
         }
-        printf("station;capacité;consommation totale des consommateurs;analyse de la comsommation");
-        fprintf("%d;%lld;%lld;%lld",a->c.identifiant,a->c.capacite,a->c.consommation,a->c.analyse);
+        printf("tation:capacité:consommation totale des consommateurs:analyse de la comsommation");
+        fprintf("%d:%lld:%lld:%lld",a->c.identifiant,a->c.capacite,a->c.consommation,a->c.analyse);
         if(a->fg!=NULL){
             creationfichieranalyse(a->fg, type,pareil);
         }
@@ -237,8 +239,8 @@ void creationfichieranalyse(Arbre *a, char *type, char * pareil){
             if (lv == NULL) {
                 exit(1);
             }
-            printf("station;capacité;consommation totale des consommateurs;analyse de la comsommation");
-            fprintf("%d;%lld;%lld;%lld",a->c.identifiant,a->c.capacite,a->c.consommation,a->c.analyse);
+            printf("tation:capacité:consommation totale des consommateurs:analyse de la comsommation");
+            fprintf("%d:%lld:%lld:%lld",a->c.identifiant,a->c.capacite,a->c.consommation,a->c.analyse);
             if(a->fg!=NULL){
                 creationfichieranalyse(a->fg, type,pareil);
             }
@@ -251,8 +253,8 @@ void creationfichieranalyse(Arbre *a, char *type, char * pareil){
             if (lv == NULL) {
                 exit(1);
             }
-            printf("station;capacité;consommation totale des consommateurs;analyse de la comsommation");
-            fprintf("%d;%lld;%lld;%lld",a->c.identifiant,a->c.capacite,a->c.consommation,a->c.analyse);
+            printf("tation:capacité:consommation totale des consommateurs:analyse de la comsommation");
+            fprintf("%d:%lld:%lld:%lld",a->c.identifiant,a->c.capacite,a->c.consommation,a->c.analyse);
             if(a->fg!=NULL){
                 creationfichieranalyse(a->fg, type,pareil);
             }
@@ -265,8 +267,8 @@ void creationfichieranalyse(Arbre *a, char *type, char * pareil){
             if (lv == NULL) {
                 exit(1);
             }
-            printf("station;capacité;consommation totale des consommateurs;analyse de la comsommation");
-            fprintf("%d;%lld;%lld;%lld",a->c.identifiant,a->c.capacite,a->c.consommation,a->c.analyse);
+            printf("tation:capacité:consommation totale des consommateurs:analyse de la comsommation");
+            fprintf("%d:%lld:%lld:%lld",a->c.identifiant,a->c.capacite,a->c.consommation,a->c.analyse);
             if(a->fg!=NULL){
                 creationfichieranalyse(a->fg, type,pareil);
             }
