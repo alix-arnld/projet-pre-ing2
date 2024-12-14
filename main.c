@@ -13,9 +13,9 @@ typedef struct station{
 
 
 typedef struct Arbre{
-    Station c;
-    struct station* fg;
-    struct station* fd;
+    Station *station;
+    struct Arbre* fg;
+    struct Arbre* fd;
     int equilibre;
 }Arbre;
 
@@ -29,12 +29,12 @@ Arbre *creationArbre(int identifiant , long long capacite){
     if(d==NULL){
         exit(2);
     }
-    d->c->identifiant=identifiant;
-    d->c->capacite=capacite;
+    d->station->identifiant=identifiant;
+    d->station->capacite=capacite;
     d->fg=NULL;
     d->fd=NULL;
     d->equilibre=0;
-    d->c->consommation=0;
+    d->station->consommation=0;
     return d;
 }
 
@@ -46,7 +46,7 @@ int min(int a, int b){
 }
 
 Arbre * rotationgauche(Arbre *a){
-    Arbre*pivot=a->fd;
+    Arbre *pivot=a->fd;
     int eq_a=a->equilibre,eq_p=pivot->equilibre;
     a->fd=pivot->fg;
     pivot->fg=a;
@@ -57,9 +57,7 @@ Arbre * rotationgauche(Arbre *a){
 }
 
 Arbre * rotationdroite(Arbre *a){
-
     Arbre *pivot=a->fg;
-    Arbre*pivot=a->fg;
     int eq_a=a->equilibre,eq_p=pivot->equilibre;
     a->fg=pivot->fd;
     pivot->fd=a;
@@ -104,10 +102,10 @@ Arbre *insertionArbre(Arbre *a, int id, long long capacite, int* h){
     if (a == NULL) {
         *h = 1;
         return creationArbre(id,capacite);
-    } else if (id < a->c->identifiant) {
+    } else if (id < a->station->identifiant) {
         a->fg = insertionArbre(a->fg,id,capacite,h);
         *h = -*h;
-    } else if (id > a->c->identifiant) {
+    } else if (id > a->station->identifiant) {
         a->fd = insertionArbre(a->fd,id,capacite,h);
     } else {
         *h = 0;
@@ -131,75 +129,67 @@ void ajoutconsommation(Arbre *a, long long k, int id){
     if(a==NULL){
         return;
     }
-    if(id<a->c->identifiant){
+    if(id<a->station->identifiant){
         ajoutconsommation(a->fg,k,id);
     }
-    if(id>a->c->identifiant){
+    if(id>a->station->identifiant){
         ajoutconsommation(a->fd,k,id);
     }
-    if(id==a->c->identifiant){
-        a->c->consommation+=k;
+    if(id==a->station->identifiant){
+        a->station->consommation+=k;
     }
 }
 
 //procédure qui lit les données filtrées depuis un fichier CSV en fonction d'un type donné et met à jour la consommation totale en y ajoutant les consommations associées aux consommateurs
 void recuperationconsommation(Arbre*a, char *type){
-    FILE *fichier=fopen(donnees_filtrees.csv,"r");
+    FILE *fichier=fopen("donnees_filtrees.csv","r");
     if(fichier ==NULL){
         exit(2);
     }
     int id_temporaire = 0;
     long long k = 0;
     if(strcmp(type,"hvb")==0){
-        while (fscanf(fichier,"%[^;];%d;%[^;];%[^;];%[^;];%[^;];%[^;];%lld",&id_temporaire,&k) == 2){
+        while (fscanf(fichier,"%*[^;];%d;%*[^;];%*[^;];%*[^;];%*[^;];%*[^;];%lld",&id_temporaire,&k) == 2){
             ajoutconsommation(a,k,id_temporaire);
         }
     }
     if(strcmp(type,"hva")==0){
-        while (fscanf(fichier,"%[^;];%[^;];%d;%[^;];%[^;];%[^;];%[^;];%lld",&id_temporaire,&k) == 2){
+        while (fscanf(fichier,"%*[^;];%*[^;];%d;%*[^;];%*[^;];%*[^;];%*[^;];%lld",&id_temporaire,&k) == 2){
             ajoutconsommation(a,k,id_temporaire);
         }
     }
     if(strcmp(type,"lv")==0){
-        while (fscanf(fichier,"%[^;];%[^;];%[^;];%d;%[^;];%[^;];%[^;];%lld",&id_temporaire,&k) == 2){
+        while (fscanf(fichier,"%*[^;];%*[^;];%*[^;];%d;%*[^;];%*[^;];%*[^;];%lld",&id_temporaire, &k) == 2){
             ajoutconsommation(a,k,id_temporaire);
         }
     }
 }
 
 //
-Arbre* recuperationfichier( Arbre* f,char * nomfichier, char *type, char *consommateur){
+Arbre* recuperationfichier(char * nomfichier, char *type, char *consommateur){
     FILE *fichier=fopen(nomfichier,"r");
     if(fichier ==NULL){
         exit(2);
     }
-    if(f==NULL){
-        fclose(fichier);
-        exit(2);
-    }
-
-    while(fscanf(file,"%d;%[^;];%[^;];%[^;];%[^;];%[^;];%lld",f->c->id,f->c->identifiant,f->c->capacite)==2){
-
-        }
-    }
-
-    while(fgets(ligne,199,fichier)){
-        if(sscanf(ligne, "%d;%d;%d;%d",f->c->idcentrale,f->c->identifiant,f->c->capacite)){
-            insertionArbre(f,f->c);
-        }
+    Arbre* n=NULL;
+    int ident;
+    int h=0;
+    long long capa;
+    while(fscanf(fichier,"%d;%*[^;];%*[^;];%*[^;];%*[^;];%*[^;];%lld",&ident,&capa)==2){
+        n = insertionArbre(n, ident, capa, &h);
     }
     fclose(fichier);
-    return f;
+    return n;
 }
 
 //Une procédure qui calcule la différence entre la capacité d'une station et la consommation des consommateurs avec un parcours infixe
- void sommeconsommation(Arbre* a){
+void sommeconsommation(Arbre* a){
 
     if(a==NULL){
         exit(2);
     }
     sommeconsommation(a->fg);
-    a->c->analyse= (a->c.capacite - a->c.consommation);
+    a->station->analyse = (a->station->capacite - a->station->consommation);
     sommeconsommation(a->fd);
 }
 
@@ -211,7 +201,7 @@ void creationfichieranalyse(Arbre *a, char *type, char * pareil){
             exit(1);
         }
         printf("station:capacité:consommation totale des consommateurs:analyse de la comsommation");
-        fprintf("%d:%lld:%lld:%lld",a->c.identifiant,a->c.capacite,a->c.consommation,a->c.analyse);
+        fprintf(hvb,"%d:%lld:%lld:%lld",a->station->identifiant,a->station->capacite,a->station->consommation,a->station->analyse);
         if(a->fg!=NULL){
             creationfichieranalyse(a->fg, type,pareil);
         }
@@ -225,7 +215,7 @@ void creationfichieranalyse(Arbre *a, char *type, char * pareil){
             exit(1);
         }
         printf("tation:capacité:consommation totale des consommateurs:analyse de la comsommation");
-        fprintf("%d:%lld:%lld:%lld",a->c.identifiant,a->c.capacite,a->c.consommation,a->c.analyse);
+        fprintf(hva, "%d:%lld:%lld:%lld",a->station->identifiant,a->station->capacite,a->station->consommation,a->station->analyse);
         if(a->fg!=NULL){
             creationfichieranalyse(a->fg, type,pareil);
         }
@@ -240,7 +230,7 @@ void creationfichieranalyse(Arbre *a, char *type, char * pareil){
                 exit(1);
             }
             printf("tation:capacité:consommation totale des consommateurs:analyse de la comsommation");
-            fprintf("%d:%lld:%lld:%lld",a->c.identifiant,a->c.capacite,a->c.consommation,a->c.analyse);
+            fprintf(lv,"%d:%lld:%lld:%lld",a->station->identifiant,a->station->capacite,a->station->consommation,a->station->analyse);
             if(a->fg!=NULL){
                 creationfichieranalyse(a->fg, type,pareil);
             }
@@ -254,7 +244,7 @@ void creationfichieranalyse(Arbre *a, char *type, char * pareil){
                 exit(1);
             }
             printf("tation:capacité:consommation totale des consommateurs:analyse de la comsommation");
-            fprintf("%d:%lld:%lld:%lld",a->c.identifiant,a->c.capacite,a->c.consommation,a->c.analyse);
+            fprintf(lv,"%d:%lld:%lld:%lld",a->station->identifiant,a->station->capacite,a->station->consommation,a->station->analyse);
             if(a->fg!=NULL){
                 creationfichieranalyse(a->fg, type,pareil);
             }
@@ -268,7 +258,7 @@ void creationfichieranalyse(Arbre *a, char *type, char * pareil){
                 exit(1);
             }
             printf("tation:capacité:consommation totale des consommateurs:analyse de la comsommation");
-            fprintf("%d:%lld:%lld:%lld",a->c.identifiant,a->c.capacite,a->c.consommation,a->c.analyse);
+            fprintf(lv, "%d:%lld:%lld:%lld",a->station->identifiant,a->station->capacite,a->station->consommation,a->station->analyse);
             if(a->fg!=NULL){
                 creationfichieranalyse(a->fg, type,pareil);
             }
@@ -279,7 +269,26 @@ void creationfichieranalyse(Arbre *a, char *type, char * pareil){
     }
 }
 
-int main(char **argv) {
-    printf("Hello, World!\n");
+void liberationArbre(Arbre* a){
+    if(a==NULL){
+        return;
+    }
+    liberationArbre(a->fg);
+    liberationArbre(a->fd);
+    free(a);
+}
+
+int main(int arc, char **argv) {
+    Arbre* a= recuperationfichier("fichier",argv[1],argv[2]);
+    recuperationconsommation(a,argv[1]);
+    creationfichieranalyse(a,argv[1],luciejetelaissemodifier);
+    liberationArbre(a);
     return 0;
 }
+
+/*
+
+ message.txt
+9 Ko
+
+*/
