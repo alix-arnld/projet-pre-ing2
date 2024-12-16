@@ -8,6 +8,7 @@ typedef struct station{
     long long capacite;
     long long consommation;
     long long analyse;
+    long long valeur_absolue;
 }Station;
 
 
@@ -199,6 +200,10 @@ void sommeconsommation(Arbre* a){
     }
     sommeconsommation(a->fg);
     a->station->analyse = (a->station->capacite - a->station->consommation);
+    a->station->valeur_absolue=a->station->analyse;
+    if(a->station->valeur_absolue<0){
+        a->station->valeur_absolue=-a->station->valeur_absolue;
+    }
     sommeconsommation(a->fd);
 }
 
@@ -213,7 +218,7 @@ void creationfichieranalyse(Arbre *a, char *type, char * consommateur){
         if (fichier == NULL) {
             exit(2);
         }
-        printf("station:capacité:consommation totale des consommateurs:analyse de la comsommation");
+        fprintf(fichier,"station:capacité:consommation totale des consommateurs:analyse de la comsommation");
         fprintf(fichier,"%d:%lld:%lld:%lld",a->station->identifiant,a->station->capacite,a->station->consommation,a->station->analyse);
         if(a->fg!=NULL){
             creationfichieranalyse(a->fg, type,consommateur);
@@ -231,7 +236,7 @@ void creationfichieranalyse(Arbre *a, char *type, char * consommateur){
         if (fichier == NULL) {
             exit(2);
         }
-        printf("station:capacité:consommation totale des consommateurs:analyse de la comsommation");
+        fprintf(fichier,"station:capacité:consommation totale des consommateurs:analyse de la comsommation");
         fprintf(fichier, "%d:%lld:%lld:%lld",a->station->identifiant,a->station->capacite,a->station->consommation,a->station->analyse);
         if(a->fg!=NULL){
             creationfichieranalyse(a->fg, type,consommateur);
@@ -250,7 +255,7 @@ void creationfichieranalyse(Arbre *a, char *type, char * consommateur){
             if (fichier == NULL) {
                 exit(2);
             }
-            printf("station:capacité:consommation totale des consommateurs:analyse de la comsommation");
+            fprintf(fichier,"station:capacité:consommation totale des consommateurs:analyse de la comsommation");
             fprintf(fichier,"%d:%lld:%lld:%lld",a->station->identifiant,a->station->capacite,a->station->consommation,a->station->analyse);
             if(a->fg!=NULL){
                 creationfichieranalyse(a->fg, type,consommateur);
@@ -268,7 +273,7 @@ void creationfichieranalyse(Arbre *a, char *type, char * consommateur){
             if (fichier == NULL) {
                 exit(2);
             }
-            printf("station:capacité:consommation totale des consommateurs:analyse de la comsommation");
+            fprintf(fichier,"station:capacité:consommation totale des consommateurs:analyse de la comsommation");
             fprintf(fichier,"%d:%lld:%lld:%lld",a->station->identifiant,a->station->capacite,a->station->consommation,a->station->analyse);
             if(a->fg!=NULL){
                 creationfichieranalyse(a->fg, type,consommateur);
@@ -283,11 +288,14 @@ void creationfichieranalyse(Arbre *a, char *type, char * consommateur){
         }
         if(strcmp(consommateur,"all")==0) {
             FILE *fichier = fopen("lv_all.csv", "w");
+            FILE *valeur_absolue = fopen("lv_valeur_absolue.csv", "w");
             if (fichier == NULL) {
                 exit(2);
             }
-            printf("station:capacité:consommation totale des consommateurs:analyse de la comsommation");
-            fprintf(fichier, "%d:%lld:%lld:%lld",a->station->identifiant,a->station->capacite,a->station->consommation,a->station->analyse);
+            fprintf(fichier,"station:capacité:consommation totale des consommateurs:analyse de la comsommation\n");
+            fprintf(fichier, "%d:%lld:%lld:%lld\n",a->station->identifiant,a->station->capacite,a->station->consommation,a->station->analyse);
+            fprintf(valeu_absolue,"station:capacité:consommation totale des consommateurs:analyse de la comsommation en valeur absolue\n");
+            fprintf(valeur_absolue, "%d:%lld:%lld:%lld\n",a->station->identifiant,a->station->capacite,a->station->consommation,a->station->valeur_absolue);
             if(a->fg!=NULL){
                 creationfichieranalyse(a->fg, type,consommateur);
             }
