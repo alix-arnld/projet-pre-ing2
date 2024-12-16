@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <math.h>
+#include <string.h>
 
 typedef struct station{
     int identifiant;
@@ -319,8 +319,3 @@ int main(int arc, char **argv) {
     liberationArbre(a);
     return 0;
 }
-
-/*
- message.txt
-9 Ko
-*/
