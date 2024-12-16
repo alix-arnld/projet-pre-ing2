@@ -198,7 +198,7 @@ temps1=$(( fin1 - debut1 ))
 executable="main"
 
 # Vérifier si l'exécutable existe sinon on le genere
-if [[ ! -x "$executable" ]]; then
+if [[ ! -f "$executable" ]]; then
     echo "L'exécutable '$executable' n'existe pas ou n'est pas exécutable."
     echo "Lancement de la compilation..."
     make
