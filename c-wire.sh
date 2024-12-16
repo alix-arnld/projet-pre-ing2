@@ -35,6 +35,12 @@ function afficher_aide() {
     exit 0
 }
 
+for arg in "@"; do
+    if [ "$arg" == '-h' ]; then
+        argh=1
+    fi
+done     
+
 if [[ "$1" == "-h" ]]; then
     afficher_aide
     exit 0
@@ -52,6 +58,8 @@ while true; do
             break  # Sortir de la boucle si le fichier est correct
         else
             echo "Le fichier n'est pas au format CSV. Veuillez réessayer."
+            afficher_aide
+            exit 1
         fi
     else
         echo "Le fichier $chemin_fichier n'existe pas. Veuillez réessayer."
@@ -65,6 +73,8 @@ while true; do
         break
     else
         echo "Type de station invalide. Veuillez réessayer."
+        afficher_aide
+        exit 2
     fi
 done
 
@@ -75,6 +85,8 @@ while true; do
     # Vérification des combinaisons interdites
         if [[ "$type_station" =~ ^(hvb|hva)$ ]] && [[ "$type_consommateur" =~ ^(all|indiv)$ ]]; then
             echo "Erreur : Les combinaisons 'hvb all' 'hvb all' 'hva all' et 'hva indiv' sont toutes interdites. Veuillez réessayer"
+            echo "On va traiter les compagnies uniquement"
+            type_consommateur="comp"
         else 
             break
         fi
@@ -85,6 +97,9 @@ done
 
 # Demande l'identifiant d'une centrale
 read -p "Entrez l'identiant de la centrale (optional): " identifiant_centrale
+
+# Stocker le temps de début
+debut1=$(date +%s)
 
 # construction du fichier de capacites en fonction des parametres
 
@@ -170,14 +185,12 @@ echo "Power plant;HV-B Station;HV-A Station;LV Station;Company;Individual;Capaci
 cat donnees_filtrees.csv >> temp.csv
 mv temp.csv donnees_filtrees.csv
 
-# construction du nom du fichier de resultats en fonction des parametres
-if [[ -n "$identifiant_centrale" ]]; then
-    # Si l'identifiant de centrale est renseigné, on construit un nom de fichier complet
-    fichier_resultat="${type_station}_${type_consommateur}_${identifiant_centrale}.csv"
-else
-    # Sinon, on construit un nom de fichier sans l'identifiant de centrale
-    fichier_resultat="${type_station}_${type_consommateur}.csv"
-fi
+# Stocker le temps de fin
+fin1=$(date +%s)
+
+# Calculer le temps écoulé
+temps1=$(( fin1 - debut1 ))
+
 
 # on verifie si l executable existe sinon on le complile via un makefile
 
@@ -191,23 +204,28 @@ if [[ ! -x "$executable" ]]; then
     make
 fi
 
-# Stocker le temps de début
-debut1=$(date +%s)
-
-# Lancer l'exécutable et rediriger la sortie vers un fichier
-./"$executable"
-
-# on copie les resultats du programme c dans le fichier final
-cp toto.csv $fichier_resultat
-
-# Stocker le temps de fin
-fin1=$(date +%s)
-
-# Calculer le temps écoulé
-temps1=$(( fin1 - debut1 ))
-
 # Stocker le temps de début dans une variable
 debut2=$(date +%s)
+
+# Lancer l'exécutable et rediriger la sortie vers un fichier
+
+if [[ -n "$identifiant_centrale" ]]; then
+    # Si l'identifiant de centrale est renseigné, on construit un nom de fichier complet
+    ./"$executable" $type_station $type_consommateur $identifiant_centrale
+else
+    # Sinon, on construit un nom de fichier sans l'identifiant de centrale
+    ./"$executable" $type_station $type_consommateur
+fi
+
+# on copie les resultats du programme c dans le fichier final
+if [[ -n "$identifiant_centrale" ]]; then
+    # Si l'identifiant de centrale est renseigné, on construit un nom de fichier complet
+    fichier_resultat="${type_station}_${type_consommateur}_${identifiant_centrale}.csv"
+else
+    # Sinon, on construit un nom de fichier sans l'identifiant de centrale
+    fichier_resultat="${type_station}_${type_consommateur}.csv"
+fi
+
 
 # On extrait les 10 min et les 10 max dans les cas lv_all par consommation
 if [[ "$type_station" == "lv" && "$type_consommateur" == "all" ]]; then
