@@ -19,7 +19,7 @@ typedef struct Arbre{
     int equilibre;
 }Arbre;
 
-//fonction qui va créer un nœud de l'arbre et l'initialera
+//fonction qui va créer un nœud de l'arbre et l'initialisera
 Arbre *creationArbre(int identifiant , long long capacite){
     Arbre *d=malloc(sizeof(Arbre));
     if(d==NULL){
