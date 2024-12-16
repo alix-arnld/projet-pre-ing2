@@ -199,10 +199,10 @@ void sommeconsommation(Arbre* a){
     }
     sommeconsommation(a->fg);
     a->station->analyse = (a->station->capacite - a->station->consommation);
-    a->station->valeur_absolue=a->station->analyse;
-    if(a->station->valeur_absolue<0){
-        a->station->valeur_absolue=-a->station->valeur_absolue;
-    }
+    //a->station->valeur_absolue=a->station->analyse;
+    //if(a->station->valeur_absolue<0){
+       // a->station->valeur_absolue=-a->station->valeur_absolue;
+   // }
     sommeconsommation(a->fd);
 }
 
