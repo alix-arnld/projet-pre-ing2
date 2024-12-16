@@ -1,11 +1,11 @@
 # Nom de l'exécutable
-TARGET = mon_programme
+TARGET = main
 
 # Compilateur
 CC = gcc
 
 # Fichier source
-SRCS = mon_programme.c
+SRCS = main.c
 
 # Fichiers objets (dérivés des sources)
 OBJS = $(SRCS:.c=.o)
