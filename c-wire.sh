@@ -8,7 +8,7 @@ function afficher_aide() {
     echo "un type de consommateur et, éventuellement, un identifiant de centrale."
     echo
     echo "Options :"
-    echo "  --help, -h       Affiche cette aide et quitte le script."
+    echo "  -h       Affiche cette aide et quitte le script."
     echo
     echo "Étapes du script :"
     echo "  1. Saisissez le chemin où le fichier source ***.csv existe."
@@ -26,27 +26,35 @@ function afficher_aide() {
     echo
     echo "Exemple :"
     echo "  $0"
-    echo "    Entrez le chemin du fichier CSV : /home/user/projet"
+    echo "    Entrez le chemin du fichier et le nom du fichier csv : /home/user/projet/cs-wire.csv"
     echo "    Entrez le type de station (hvb, hva ou lv) : hva"
     echo "    Entrez le type de consommateur (comp, indiv ou all) : comp"
-    echo "    Entrez l'identifiant de la centrale (optional) : 123"
+    echo "    Entrez l'identifiant de la centrale (optional) : 2"
     echo
     echo "Note : Si une combinaison invalide est détectée, le script vous demandera de réessayer."
     exit 0
 }
 
-if [[ "$1" == "--help" || "$1" == "-h" ]]; then
+if [[ "$1" == "-h" ]]; then
     afficher_aide
     exit 0
 fi
 
-# Boucle pour vérifier que le chemin d'acces saisi mene vers le fichier source ***.csv
+# Boucle pour vérifier que le chemin d'acces saisi mene vers le fichier source csv
 while true; do
-    read -p "Entrez le chemin du fichier CSV : " chemin_fichier
-    if [[ -f "$chemin_fichier"/c-wire_v00.csv ]]; then
-        break
+    read -p "Entrez le chemin complet du fichier CSV suivi du nom du fichier : " chemin_fichier
+
+    # Vérification de l'existence du fichier
+    if [[ -e "$chemin_fichier" ]]; then
+        # Vérification de l'extension .csv
+        if [[ "$chemin_fichier" =~ \.csv$ ]]; then
+            echo "Le fichier $chemin_fichier a été trouvé."
+            break  # Sortir de la boucle si le fichier est correct
+        else
+            echo "Le fichier n'est pas au format CSV. Veuillez réessayer."
+        fi
     else
-        echo "Pas de fichier c-wire_v00 via ce chemin. Veuillez réessayer."
+        echo "Le fichier $chemin_fichier n'existe pas. Veuillez réessayer."
     fi
 done
 
@@ -78,66 +86,80 @@ done
 # Demande l'identifiant d'une centrale
 read -p "Entrez l'identiant de la centrale (optional): " identifiant_centrale
 
-# construcion du fichier de capacites en fonction des parametres
+# construction du fichier de capacites en fonction des parametres
+
+entete=1
+
 if [[ -n "$identifiant_centrale" ]]; then
     if [[ "$type_station" == "hvb" ]]; then
-        awk -F';' -v var1="$identifiant_centrale" '$1 == var1 && $2 != "-" && $3 == "-" && $7 != "-"' "$chemin_fichier"/c-wire_v00.csv > donnees_capacites.csv
+        awk -F';' -v var1="$identifiant_centrale" '$1 == var1 && $2 != "-" && $3 == "-" && $7 != "-"' "$chemin_fichier"> donnees_capacites.csv
     else 
         if [[ "$type_station" == "hva" ]]; then
-            awk -F';' -v var1="$identifiant_centrale" '$1 == var1 && $2 != "-" && $3 != "-" && $7 != "-"' "$chemin_fichier"/c-wire_v00.csv > donnees_capacites.csv
+            awk -F';' -v var1="$identifiant_centrale" '$1 == var1 && $2 != "-" && $3 != "-" && $7 != "-"' "$chemin_fichier" > donnees_capacites.csv
         else
             if [[ "$type_station" == "lv" ]]; then
-                awk -F';' -v var1="$identifiant_centrale" '$1 == var1 && $4 != "-" && $7 != "-"' "$chemin_fichier"/c-wire_v00.csv > donnees_capacites.csv
+                awk -F';' -v var1="$identifiant_centrale" '$1 == var1 && $4 != "-" && $7 != "-"' "$chemin_fichier" > donnees_capacites.csv
             fi
         fi
     fi
 else
      if [[ "$type_station" == "hvb" ]]; then
-        awk -F';' '$2 != "-" && $3 == "-" && $7 != "-"' "$chemin_fichier"/c-wire_v00.csv > donnees_capacites.csv
+        awk -F';' '$2 != "-" && $3 == "-" && $7 != "-"' "$chemin_fichier" > donnees_capacites.csv
     else 
         if [[ "$type_station" == "hva" ]]; then
-            awk -F';' '$2 != "-" && $3 != "-" && $7 != "-"' "$chemin_fichier"/c-wire_v00.csv > donnees_capacites.csv
+            awk -F';' '$2 != "-" && $3 != "-" && $7 != "-"' "$chemin_fichier" > donnees_capacites.csv
+            entete=0
         else
             if [[ "$type_station" == "lv" ]]; then
-                awk -F';' '$4 != "-" && $7 != "-"' "$chemin_fichier"/c-wire_v00.csv > donnees_capacites.csv
+                awk -F';' '$4 != "-" && $7 != "-"' "$chemin_fichier" > donnees_capacites.csv
+                entete=0
             fi
         fi
     fi
 fi
 
-# Ajouter l'en-tête au fichier de sortie
-echo "Power plant;HV-B Station;HV-A Station;LV Station;Company;Individual;Capacity;Load" > temp.csv
-cat donnees_capacites.csv >> temp.csv
-mv temp.csv donnees_capacites.csv
-
+# Ajouter l'en-tête au fichier de sortie si besoin
+if [[ "$entete" == "1" ]]; then
+    echo "Power plant;HV-B Station;HV-A Station;LV Station;Company;Individual;Capacity;Load" > temp.csv
+    cat donnees_capacites.csv >> temp.csv
+    mv temp.csv donnees_capacites.csv
+fi
 
 # construction du fichier source filtre en fonction des parametres
 
 if [[ -n "$identifiant_centrale" ]]; then
     if [[ "$type_station" == "hvb" ]]; then
-        awk -F';' -v var1="$identifiant_centrale" '$1 == var1 && $2 != "-" && $3 == "-" && $8 != "-"' "$chemin_fichier"/c-wire_v00.csv > donnees_filtrees.csv
+        awk -F';' -v var1="$identifiant_centrale" '$1 == var1 && $2 != "-" && $3 == "-" && $8 != "-"' "$chemin_fichier" > donnees_filtrees.csv
     else 
         if [[ "$type_station" == "hva" ]]; then
-            awk -F';' -v var1="$identifiant_centrale" '$1 == var1 && $2 == "-" && $3 != "-" && $8 != "-"' "$chemin_fichier"/c-wire_v00.csv > donnees_filtrees.csv
+            awk -F';' -v var1="$identifiant_centrale" '$1 == var1 && $2 == "-" && $3 != "-" && $8 != "-"' "$chemin_fichier" > donnees_filtrees.csv
         else
             if [[ "$type_station" == "lv" && "$type_consommateur" == "indiv" ]]; then
-                awk -F';' -v var1="$identifiant_centrale" '$1 == var1 && $2 == "-" && $3 == "-" && $5 == "-" && $6 != "-" && $8 != "-"' "$chemin_fichier"/c-wire_v00.csv > donnees_filtrees.csv
+                awk -F';' -v var1="$identifiant_centrale" '$1 == var1 && $2 == "-" && $3 == "-" && $5 == "-" && $6 != "-" && $8 != "-"' "$chemin_fichier" > donnees_filtrees.csv
             else
-                awk -F';' -v var1="$identifiant_centrale" '$1 == var1 && $2 == "-" && $3 == "-" && $4 != "-" && $8 != "-"' "$chemin_fichier"/c-wire_v00.csv > donnees_filtrees.csv
+                if [[ "$type_station" == "lv" && "$type_consommateur" == "comp" ]]; then
+                    awk -F';' -v var1="$identifiant_centrale" '$1 == var1 && $2 == "-" && $3 == "-" && $5 != "-" && $6 == "-" && $8 != "-"' "$chemin_fichier" > donnees_filtrees.csv
+                else
+                    awk -F';' -v var1="$identifiant_centrale" '$1 == var1 && $2 == "-" && $3 == "-" && $4 != "-" && $8 != "-"' "$chemin_fichier" > donnees_filtrees.csv
+                fi
             fi
         fi
     fi
 else
     if [[ "$type_station" == "hvb" ]]; then
-        awk -F';' '$2 != "-" && $3 == "-" && $8 != "-"' "$chemin_fichier"/c-wire_v00.csv > donnees_filtrees.csv
+        awk -F';' '$2 != "-" && $3 == "-" && $8 != "-"' "$chemin_fichier" > donnees_filtrees.csv
     else 
         if [[ "$type_station" == "hva" ]]; then
-            awk -F';' '$2 == "-" && $3 != "-" && $8 != "-"' "$chemin_fichier"/c-wire_v00.csv > donnees_filtrees.csv
+            awk -F';' '$2 == "-" && $3 != "-" && $8 != "-"' "$chemin_fichier" > donnees_filtrees.csv
         else
             if [[ "$type_station" == "lv" && "$type_consommateur" == "indiv" ]]; then
-                awk -F';' '$2 == "-" && $3 == "-" && $4 != "-" && $6 != "-" && $8 != "-"' "$chemin_fichier"/c-wire_v00.csv > donnees_filtrees.csv
-            else
-                awk -F';' '$2 == "-" && $3 == "-" && $4 != "-" && $8 != "-"' "$chemin_fichier"/c-wire_v00.csv > donnees_filtrees.csv
+                awk -F';' '$2 == "-" && $3 == "-" && $4 != "-" && $5 == "-" && $6 != "-" && $8 != "-"' "$chemin_fichier" > donnees_filtrees.csv
+            else    
+                if [[ "$type_station" == "lv" && "$type_consommateur" == "comp" ]]; then
+                    awk -F';' '$2 == "-" && $3 == "-" && $4 != "-" && $5 != "-" && $6 == "-" && $8 != "-"' "$chemin_fichier" > donnees_filtrees.csv
+                else
+                    awk -F';' '$2 == "-" && $3 == "-" && $4 != "-" && $8 != "-"' "$chemin_fichier" > donnees_filtrees.csv
+                fi
             fi
         fi
     fi
@@ -148,12 +170,6 @@ echo "Power plant;HV-B Station;HV-A Station;LV Station;Company;Individual;Capaci
 cat donnees_filtrees.csv >> temp.csv
 mv temp.csv donnees_filtrees.csv
 
-# RESTE A FAIRE
-# on verifie si l executable existe sinon on le complile via un makefile
-# on passe le fichier de donnnes filtres et le fichier de capacite au programme c
-# on recupere les resultats du programme c
-# on genere le resultat dans le fichier fichier_resultat.csv
-
 # construction du nom du fichier de resultats en fonction des parametres
 if [[ -n "$identifiant_centrale" ]]; then
     # Si l'identifiant de centrale est renseigné, on construit un nom de fichier complet
@@ -162,3 +178,69 @@ else
     # Sinon, on construit un nom de fichier sans l'identifiant de centrale
     fichier_resultat="${type_station}_${type_consommateur}.csv"
 fi
+
+# on verifie si l executable existe sinon on le complile via un makefile
+
+# Nom de l'exécutable à vérifier
+executable="mon_programme"
+
+# Vérifier si l'exécutable existe sinon on le genere
+if [[ ! -x "$executable" ]]; then
+    echo "L'exécutable '$executable' n'existe pas ou n'est pas exécutable."
+    echo "Lancement de la compilation..."
+    make
+fi
+
+# Stocker le temps de début
+debut1=$(date +%s)
+
+# Lancer l'exécutable et rediriger la sortie vers un fichier
+./"$executable"
+
+# on copie les resultats du programme c dans le fichier final
+cp toto.csv $fichier_resultat
+
+# Stocker le temps de fin
+fin1=$(date +%s)
+
+# Calculer le temps écoulé
+temps1=$(( fin1 - debut1 ))
+
+# Stocker le temps de début dans une variable
+debut2=$(date +%s)
+
+# On extrait les 10 min et les 10 max dans les cas lv_all par consommation
+if [[ "$type_station" == "lv" && "$type_consommateur" == "all" ]]; then
+    # Extraire les 10 valeurs maximales et leurs lignes associées
+    sort -nr -t':' -k3 "$fichier_resultat" | head -n 10 > lv_all_max.csv
+
+    # Extraire les 10 valeurs minimales et leurs lignes associées
+    sort -n -t':' -k3 "$fichier_resultat" | head -n 10 > lv_all_min.csv
+
+    # Combiner les deux fichiers en un seul
+    cat lv_all_min.csv lv_all_max.csv > lv_all_minmax.csv
+
+    # Supprimer le fichier temporaire
+    rm lv_all_max.csv lv_all_min.csv
+
+    # Trier par quantité d'énergie consommée en trop des 20 lignes
+    sort -n -t':' -k4 lv_all_minmax.csv | head -n 20 > tmp.csv
+
+    # Ajouter l'en-tête et déplacer le fichier final
+    echo "Station:Capacite:Consommation:Difference" > lv_all_minmax.csv
+    cat tmp.csv >> lv_all_minmax.csv
+
+    # Supprimer le fichier temporaire
+    rm tmp.csv
+fi
+
+# Stocker le temps de fin
+fin2=$(date +%s)
+
+# Calculer le temps écoulé
+temps2=$(( fin2 - debut2 ))
+
+temps_total=$(( temps1 + temps2 ))
+
+# Afficher le résultat avec un formatage plus clair
+echo "L'exécution du script a duré $temps_total secondes."
