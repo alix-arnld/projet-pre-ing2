@@ -23,7 +23,7 @@ typedef struct Arbre{
 Arbre *creationArbre(int identifiant , long long capacite){
     Arbre *d=malloc(sizeof(Arbre));
     if(d==NULL){
-        exit(2);
+        exit(3);
     }
     d->station->identifiant=identifiant;
     d->station->capacite=capacite;
@@ -132,8 +132,7 @@ Arbre *insertionArbre(Arbre *a, int id, long long capacite, int* h){
 //procédure de recherche à partir des identifiants de la station pour ajouter la consommation du consommateur à celle totale
 void ajoutconsommation(Arbre *a, long long k, int id){
     if(a==NULL){
-        printf("l'arbre est vide");
-        return;
+        exit(2);
     }
     if(id<a->station->identifiant){
         ajoutconsommation(a->fg,k,id);
@@ -149,12 +148,11 @@ void ajoutconsommation(Arbre *a, long long k, int id){
 //procédure qui lit les données filtrées depuis un fichier CSV en fonction d'un type donné et met à jour la consommation totale en y ajoutant les consommations associées aux consommateurs
 void recuperationconsommation(Arbre*a, char *type){
     if(a==NULL){
-        printf("L'arbre est vide");
-        return;
+        exit(2);
     }
     FILE *fichier=fopen("donnees_filtrees.csv","r");
     if(fichier ==NULL){
-        exit(2);
+        exit(4);
     }
 
     int id_temporaire = 0;
@@ -180,7 +178,7 @@ void recuperationconsommation(Arbre*a, char *type){
 Arbre* recuperationfichier(char * nomfichier, char *type, char *consommateur){
     FILE *fichier=fopen(nomfichier,"r");
     if(fichier ==NULL){
-        exit(2);
+        exit(4);
     }
     Arbre* n=NULL;
     int ident;
@@ -197,8 +195,7 @@ Arbre* recuperationfichier(char * nomfichier, char *type, char *consommateur){
 void sommeconsommation(Arbre* a){
 
     if(a==NULL){
-        printf("L'arbre est vide");
-        return;
+        exit(2);
     }
     sommeconsommation(a->fg);
     a->station->analyse = (a->station->capacite - a->station->consommation);
@@ -209,107 +206,74 @@ void sommeconsommation(Arbre* a){
     sommeconsommation(a->fd);
 }
 
+//procédure qui va écrire dans un fichier les données en parcourant l'arbre
+void ecriturefichier(Arbre * a, FILE *nomfichier){
+    fprintf(nomfichier,"station:capacité:consommation totale des consommateurs:analyse de la comsommation");
+    fprintf(nomfichier,"%d:%lld:%lld:%lld",a->station->identifiant,a->station->capacite,a->station->consommation,a->station->analyse);
+    if(a->fg!=NULL){
+        ecriturefichier(a->fg,nomfichier);
+    }
+    else if(a->fd!=NULL){
+        ecriturefichier(a->fd,nomfichier);
+    }
+}
+
 //procédure qui va créer les fichiers avec les données de surproduction ou non de chaque station en fonction de ce que l'utilisateur aura demandé
 void creationfichieranalyse(Arbre *a, char *type, char * consommateur){
     if(a==NULL){
-        printf("L'arbre est vide");
-        return;
+        exit(2);
     }
     if(strcmp(type,"hvb")==0){
         FILE *fichier = fopen("hvb_comp.csv", "w");
         if (fichier == NULL) {
-            exit(2);
+            exit(4);
         }
-        fprintf(fichier,"station:capacité:consommation totale des consommateurs:analyse de la comsommation");
-        fprintf(fichier,"%d:%lld:%lld:%lld",a->station->identifiant,a->station->capacite,a->station->consommation,a->station->analyse);
-        if(a->fg!=NULL){
-            creationfichieranalyse(a->fg, type,consommateur);
-        }
-        else if(a->fd!=NULL){
-            creationfichieranalyse(a->fd, type,consommateur);
-        }
-        else{
-            fclose(fichier);
-            return;
-        }
+        ecriturefichier(a,fichier);
+        fclose(fichier);
+
     }
     if(strcmp(type,"hva")==0){
         FILE *fichier = fopen("hva_comp.csv", "w");
         if (fichier == NULL) {
-            exit(2);
+            exit(4);
         }
-        fprintf(fichier,"station:capacité:consommation totale des consommateurs:analyse de la comsommation");
-        fprintf(fichier, "%d:%lld:%lld:%lld",a->station->identifiant,a->station->capacite,a->station->consommation,a->station->analyse);
-        if(a->fg!=NULL){
-            creationfichieranalyse(a->fg, type,consommateur);
-        }
-        else if(a->fd!=NULL){
-            creationfichieranalyse(a->fd, type,consommateur);
-        }
-        else{
+        ecriturefichier(a,fichier);
             fclose(fichier);
-            return;
         }
-    }
+
     if(strcmp(type,"lv")==0){
         if(strcmp(consommateur,"comp")==0){
             FILE *fichier = fopen("lv_comp.csv", "w");
             if (fichier == NULL) {
-                exit(2);
+                exit(4);
             }
-            fprintf(fichier,"station:capacité:consommation totale des consommateurs:analyse de la comsommation");
-            fprintf(fichier,"%d:%lld:%lld:%lld",a->station->identifiant,a->station->capacite,a->station->consommation,a->station->analyse);
-            if(a->fg!=NULL){
-                creationfichieranalyse(a->fg, type,consommateur);
-            }
-            else if(a->fd!=NULL){
-                creationfichieranalyse(a->fd, type,consommateur);
-            }
-            else{
-                fclose(fichier);
-                return;
-            }
+            ecriturefichier(a,fichier);
+            fclose(fichier);
         }
         if(strcmp(consommateur,"indiv")==0) {
             FILE *fichier = fopen("lv_indiv.csv", "w");
             if (fichier == NULL) {
-                exit(2);
+                exit(4);
             }
-            fprintf(fichier,"station:capacité:consommation totale des consommateurs:analyse de la comsommation");
-            fprintf(fichier,"%d:%lld:%lld:%lld",a->station->identifiant,a->station->capacite,a->station->consommation,a->station->analyse);
-            if(a->fg!=NULL){
-                creationfichieranalyse(a->fg, type,consommateur);
-            }
-            else if(a->fd!=NULL){
-                creationfichieranalyse(a->fd, type,consommateur);
-            }
-            else{
+            ecriturefichier(a,fichier);
                 fclose(fichier);
-                return;
-            }
         }
         if(strcmp(consommateur,"all")==0) {
             FILE *fichier = fopen("lv_all.csv", "w");
-            FILE *valeur_absolue = fopen("lv_valeur_absolue.csv", "w");
+            //FILE *valeur_absolue = fopen("lv_valeur_absolue.csv", "w");
             if (fichier == NULL) {
-                exit(2);
+                exit(4);
             }
-            fprintf(fichier,"station:capacité:consommation totale des consommateurs:analyse de la comsommation\n");
-            fprintf(fichier, "%d:%lld:%lld:%lld\n",a->station->identifiant,a->station->capacite,a->station->consommation,a->station->analyse);
-            fprintf(valeu_absolue,"station:capacité:consommation totale des consommateurs:analyse de la comsommation en valeur absolue\n");
-            fprintf(valeur_absolue, "%d:%lld:%lld:%lld\n",a->station->identifiant,a->station->capacite,a->station->consommation,a->station->valeur_absolue);
-            if(a->fg!=NULL){
-                creationfichieranalyse(a->fg, type,consommateur);
-            }
-            else if(a->fd!=NULL){
-                creationfichieranalyse(a->fd, type,consommateur);
-            }
-            else{
+            //if (valeur_absolue == NULL) {
+             //   exit(4);
+            //}
+            //fprintf(valeu_absolue,"station:capacité:consommation totale des consommateurs:analyse de la comsommation en valeur absolue\n");
+            //fprintf(valeur_absolue, "%d:%lld:%lld:%lld\n",a->station->identifiant,a->station->capacite,a->station->consommation,a->station->valeur_absolue);
+            ecriturefichier(a,fichier);
                 fclose(fichier);
-                return;
+                //fclose(valeur_absolue);
             }
         }
-    }
 }
 
 //procédure qui va libérer l'espace alloué par l'arbre en commençant par les feuilles
