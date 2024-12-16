@@ -31,6 +31,8 @@ Arbre *creationArbre(int identifiant , long long capacite){
     d->fd=NULL;
     d->equilibre=0;
     d->station->consommation=0;
+    d->station->analyse=0;
+    d->station->valeur_absolue=0;
     return d;
 }
 
