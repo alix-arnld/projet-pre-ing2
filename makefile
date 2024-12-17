@@ -1,23 +1,23 @@
-# Nom de l'exécutable
-TARGET = main
-
-# Compilateur
+# Compiler and flags
 CC = gcc
+CFLAGS = -std=c11 -Iinclude
 
-# Fichier source
-SRCS = main.c
-
-# Fichiers objets (dérivés des sources)
+# Source files and executable
+SRCS = main.c src/fonction.c
 OBJS = $(SRCS:.c=.o)
+TARGET = projet_exe
 
-# Commandes par défaut
+# Default rule
+all: $(TARGET)
+
+# Linking
 $(TARGET): $(OBJS)
-	$(CC) -o $@ $^
+	$(CC) $(OBJS) -o $(TARGET)
 
-# Règle pour générer les fichiers objets
+# Compilation
 %.o: %.c
-	$(CC) -c $< -o $@
+	$(CC) $(CFLAGS) -c $< -o $@
 
-# Nettoyer les fichiers générés
+# Clean up
 clean:
 	rm -f $(OBJS) $(TARGET)
