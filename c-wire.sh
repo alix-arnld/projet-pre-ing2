@@ -195,7 +195,7 @@ temps1=$(( fin1 - debut1 ))
 # on verifie si l executable existe sinon on le complile via un makefile
 
 # Nom de l'exécutable à vérifier
-executable="main"
+executable="projet_exe"
 
 # Vérifier si l'exécutable existe sinon on le genere
 if [[ ! -f "$executable" ]]; then
