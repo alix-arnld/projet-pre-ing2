@@ -87,6 +87,7 @@ while true; do
             echo "Erreur : Les combinaisons 'hvb all' 'hvb all' 'hva all' et 'hva indiv' sont toutes interdites. Veuillez réessayer"
             echo "On va traiter les compagnies uniquement"
             type_consommateur="comp"
+            break
         else 
             break
         fi
