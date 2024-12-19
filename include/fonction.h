@@ -30,7 +30,7 @@ Arbre * rotationdroite(Arbre *);
 
 Arbre* doublerotationgauche(Arbre *);
 
-Arbre*doublerotationdroite(Arbre*);
+Arbre*doublerotationdroite(Arbre *);
 
 Arbre* equilibrage(Arbre *);
 
@@ -40,9 +40,11 @@ void ajoutconsommation(Arbre *, long long, int);
 
 void recuperationconsommation(Arbre*, char *);
 
-Arbre* recuperationfichier(char *, char *, char *);
+Arbre* recuperationfichier(char *, char *);
 
 void sommeconsommation(Arbre*);
+
+void ecriturefichier(Arbre * , FILE *)
 
 void creationfichieranalyse(Arbre *, char *, char *);
 
