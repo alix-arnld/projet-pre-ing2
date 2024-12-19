@@ -1,6 +1,11 @@
 #ifndef PROJET_PRE_ING2_FONCTION_H
 #define PROJET_PRE_ING2_FONCTION_H
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include <string.h>
+
 typedef struct station{
     int identifiant;
     long long capacite;
@@ -11,7 +16,7 @@ typedef struct station{
 
 
 typedef struct Arbre{
-    Station *station;
+    Station station;
     struct Arbre* fg;
     struct Arbre* fd;
     int equilibre;
@@ -44,7 +49,7 @@ Arbre* recuperationfichier(char *, char *);
 
 void sommeconsommation(Arbre*);
 
-void ecriturefichier(Arbre * , FILE *)
+void ecriturefichier(Arbre * , FILE *);
 
 void creationfichieranalyse(Arbre *, char *, char *);
 
