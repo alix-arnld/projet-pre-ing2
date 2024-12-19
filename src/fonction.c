@@ -277,7 +277,7 @@ void creationfichieranalyse(Arbre *a, char *type, char * consommateur){
     }
  
     if(strcmp(type,"hvb")==0){
-        FILE *fichier = fopen("../tmp/hvb_comp.csv", "w");
+        FILE *fichier = fopen("hvb_comp.csv", "w");
         if (fichier == NULL) {
             exit(4);
         }
@@ -287,7 +287,7 @@ void creationfichieranalyse(Arbre *a, char *type, char * consommateur){
     }
     
     if(strcmp(type,"hva")==0){
-        FILE *fichier = fopen("../tmp/hva_comp.csv", "w");
+        FILE *fichier = fopen("hva_comp.csv", "w");
         if (fichier == NULL) {
             exit(4);
         }
@@ -298,7 +298,7 @@ void creationfichieranalyse(Arbre *a, char *type, char * consommateur){
 
     if(strcmp(type,"lv")==0){
         if(strcmp(consommateur,"comp")==0){
-            FILE *fichier = fopen("../tmp/lv_comp.csv", "w");
+            FILE *fichier = fopen("lv_comp.csv", "w");
             if (fichier == NULL) {
                 exit(4);
             }
@@ -307,7 +307,7 @@ void creationfichieranalyse(Arbre *a, char *type, char * consommateur){
             fclose(fichier);
         }
         if(strcmp(consommateur,"indiv")==0) {
-            FILE *fichier = fopen("../tmp/lv_indiv.csv", "w");
+            FILE *fichier = fopen("lv_indiv.csv", "w");
             if (fichier == NULL) {
                 exit(4);
             }
@@ -316,7 +316,7 @@ void creationfichieranalyse(Arbre *a, char *type, char * consommateur){
                 fclose(fichier);
         }
         if(strcmp(consommateur,"all")==0) {
-            FILE *fichier = fopen("../tmp/lv_all.csv", "w");
+            FILE *fichier = fopen("lv_all.csv", "w");
             //FILE *valeur_absolue = fopen("lv_valeur_absolue.csv", "w");
             if (fichier == NULL) {
                 exit(4);
@@ -325,7 +325,7 @@ void creationfichieranalyse(Arbre *a, char *type, char * consommateur){
              //   exit(4);
             //}
             fprintf(fichier,"station:capacité:consommation totale des consommateurs:analyse de la comsommation\n");
-            //fprintf(valeu_absolue,"station:capacité:consommation totale des consommateurs:analyse de la comsommation en valeur absolue\n");
+            //fprintf(valeur_absolue,"station:capacité:consommation totale des consommateurs:analyse de la comsommation en valeur absolue\n");
             //fprintf(valeur_absolue, "%d:%lld:%lld:%lld\n",a->station.identifiant,a->station.capacite,a->station.consommation,a->station.valeur_absolue);
             ecriturefichier(a,fichier);
                 fclose(fichier);
