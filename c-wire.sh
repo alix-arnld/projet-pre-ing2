@@ -231,7 +231,7 @@ fi
 # On extrait les 10 min et les 10 max dans les cas lv_all par consommation
 if [[ "$type_station" == "lv" && "$type_consommateur" == "all" ]]; then
     # Extraire les 10 valeurs maximales et leurs lignes associées
-    sort -nr -t':' -k3 "$fichier_resultat" | head -n 10 > lv_all_max.csv
+    sort -nr -t':' -k3 "$fichier_resultat" | head -n 11 > lv_all_max.csv
 
     # Extraire les 10 valeurs minimales et leurs lignes associées
     sort -n -t':' -k3 "$fichier_resultat" | head -n 10 > lv_all_min.csv
