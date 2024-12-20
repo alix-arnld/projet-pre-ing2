@@ -199,7 +199,7 @@ void recuperationconsommation(Arbre*a, char *type){
    
    char tab[100]; 
    int c;
-    FILE *fichier=fopen("donnees_filtrees.csv","r");
+    FILE *fichier=fopen("../tmp/donnees_filtrees.csv","r");
     if(fichier ==NULL){
         exit(4);
     }
@@ -277,7 +277,7 @@ void creationfichieranalyse(Arbre *a, char *type, char * consommateur){
     }
  
     if(strcmp(type,"hvb")==0){
-        FILE *fichier = fopen("hvb_comp.csv", "w");
+        FILE *fichier = fopen("../tests/hvb_comp.csv", "w");
         if (fichier == NULL) {
             exit(4);
         }
@@ -287,7 +287,7 @@ void creationfichieranalyse(Arbre *a, char *type, char * consommateur){
     }
     
     if(strcmp(type,"hva")==0){
-        FILE *fichier = fopen("hva_comp.csv", "w");
+        FILE *fichier = fopen("../tests/hva_comp.csv", "w");
         if (fichier == NULL) {
             exit(4);
         }
@@ -298,7 +298,7 @@ void creationfichieranalyse(Arbre *a, char *type, char * consommateur){
 
     if(strcmp(type,"lv")==0){
         if(strcmp(consommateur,"comp")==0){
-            FILE *fichier = fopen("lv_comp.csv", "w");
+            FILE *fichier = fopen("../tests/lv_comp.csv", "w");
             if (fichier == NULL) {
                 exit(4);
             }
@@ -307,7 +307,7 @@ void creationfichieranalyse(Arbre *a, char *type, char * consommateur){
             fclose(fichier);
         }
         if(strcmp(consommateur,"indiv")==0) {
-            FILE *fichier = fopen("lv_indiv.csv", "w");
+            FILE *fichier = fopen("../tests/lv_indiv.csv", "w");
             if (fichier == NULL) {
                 exit(4);
             }
@@ -316,7 +316,7 @@ void creationfichieranalyse(Arbre *a, char *type, char * consommateur){
                 fclose(fichier);
         }
         if(strcmp(consommateur,"all")==0) {
-            FILE *fichier = fopen("lv_all.csv", "w");
+            FILE *fichier = fopen("../tests/lv_all.csv", "w");
             //FILE *valeur_absolue = fopen("lv_valeur_absolue.csv", "w");
             if (fichier == NULL) {
                 exit(4);
