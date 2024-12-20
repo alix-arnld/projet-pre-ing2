@@ -53,7 +53,7 @@ while true; do
     # Vérification de l'existence du fichier
     if [[ -e "$chemin_fichier" ]]; then
         # Vérification de l'extension .csv
-        if [[ "$chemin_fichier" =~ \.csv$ ]]; then
+        if [ -f $chemin_fichier ]; then
             echo "Le fichier $chemin_fichier a été trouvé."
             break  # Sortir de la boucle si le fichier est correct
         else
