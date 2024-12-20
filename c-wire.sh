@@ -106,28 +106,41 @@ debut1=$(date +%s)
 
 entete=1
 
+if [ ! -d "tmp" ]; then
+    mkdir "tmp"
+fi
+
+if [ ! -d "graphs" ]; then
+    mkdir "graphs"
+fi
+
+if [ -d "tmp" ]; then
+    rm -rf "tmp"
+    mkdir "tmp"
+fi
+
 if [[ -n "$identifiant_centrale" ]]; then
     if [[ "$type_station" == "hvb" ]]; then
-        awk -F';' -v var1="$identifiant_centrale" '$1 == var1 && $2 != "-" && $3 == "-" && $7 != "-"' "$chemin_fichier"> donnees_capacites.csv
+        awk -F';' -v var1="$identifiant_centrale" '$1 == var1 && $2 != "-" && $3 == "-" && $7 != "-"' "$chemin_fichier"> tmp/donnees_capacites.csv
     else 
         if [[ "$type_station" == "hva" ]]; then
-            awk -F';' -v var1="$identifiant_centrale" '$1 == var1 && $2 != "-" && $3 != "-" && $7 != "-"' "$chemin_fichier" > donnees_capacites.csv
+            awk -F';' -v var1="$identifiant_centrale" '$1 == var1 && $2 != "-" && $3 != "-" && $7 != "-"' "$chemin_fichier" > tmp/donnees_capacites.csv
         else
             if [[ "$type_station" == "lv" ]]; then
-                awk -F';' -v var1="$identifiant_centrale" '$1 == var1 && $4 != "-" && $7 != "-"' "$chemin_fichier" > donnees_capacites.csv
+                awk -F';' -v var1="$identifiant_centrale" '$1 == var1 && $4 != "-" && $7 != "-"' "$chemin_fichier" > tmp/donnees_capacites.csv
             fi
         fi
     fi
 else
      if [[ "$type_station" == "hvb" ]]; then
-        awk -F';' '$2 != "-" && $3 == "-" && $7 != "-"' "$chemin_fichier" > donnees_capacites.csv
+        awk -F';' '$2 != "-" && $3 == "-" && $7 != "-"' "$chemin_fichier" > tmp/donnees_capacites.csv
     else 
         if [[ "$type_station" == "hva" ]]; then
-            awk -F';' '$2 != "-" && $3 != "-" && $7 != "-"' "$chemin_fichier" > donnees_capacites.csv
+            awk -F';' '$2 != "-" && $3 != "-" && $7 != "-"' "$chemin_fichier" > tmp/donnees_capacites.csv
             entete=0
         else
             if [[ "$type_station" == "lv" ]]; then
-                awk -F';' '$4 != "-" && $7 != "-"' "$chemin_fichier" > donnees_capacites.csv
+                awk -F';' '$4 != "-" && $7 != "-"' "$chemin_fichier" > tmp/donnees_capacites.csv
                 entete=0
             fi
         fi
@@ -136,45 +149,45 @@ fi
 
 # Ajouter l'en-tête au fichier de sortie si besoin
 if [[ "$entete" == "1" ]]; then
-    echo "Power plant;HV-B Station;HV-A Station;LV Station;Company;Individual;Capacity;Load" > temp.csv
-    cat donnees_capacites.csv >> temp.csv
-    mv temp.csv donnees_capacites.csv
+    echo "Power plant;HV-B Station;HV-A Station;LV Station;Company;Individual;Capacity;Load" > tmp/temp.csv
+    cat tmp/donnees_capacites.csv >> tmp/temp.csv
+    mv tmp/temp.csv tmp/donnees_capacites.csv
 fi
 
 # construction du fichier source filtre en fonction des parametres
 
 if [[ -n "$identifiant_centrale" ]]; then
     if [[ "$type_station" == "hvb" ]]; then
-        awk -F';' -v var1="$identifiant_centrale" '$1 == var1 && $2 != "-" && $3 == "-" && $8 != "-"' "$chemin_fichier" > donnees_filtrees.csv
+        awk -F';' -v var1="$identifiant_centrale" '$1 == var1 && $2 != "-" && $3 == "-" && $8 != "-"' "$chemin_fichier" > tmp/donnees_filtrees.csv
     else 
         if [[ "$type_station" == "hva" ]]; then
-            awk -F';' -v var1="$identifiant_centrale" '$1 == var1 && $2 == "-" && $3 != "-" && $8 != "-"' "$chemin_fichier" > donnees_filtrees.csv
+            awk -F';' -v var1="$identifiant_centrale" '$1 == var1 && $2 == "-" && $3 != "-" && $8 != "-"' "$chemin_fichier" > tmp/donnees_filtrees.csv
         else
             if [[ "$type_station" == "lv" && "$type_consommateur" == "indiv" ]]; then
-                awk -F';' -v var1="$identifiant_centrale" '$1 == var1 && $2 == "-" && $3 == "-" && $5 == "-" && $6 != "-" && $8 != "-"' "$chemin_fichier" > donnees_filtrees.csv
+                awk -F';' -v var1="$identifiant_centrale" '$1 == var1 && $2 == "-" && $3 == "-" && $5 == "-" && $6 != "-" && $8 != "-"' "$chemin_fichier" > tmp/donnees_filtrees.csv
             else
                 if [[ "$type_station" == "lv" && "$type_consommateur" == "comp" ]]; then
-                    awk -F';' -v var1="$identifiant_centrale" '$1 == var1 && $2 == "-" && $3 == "-" && $5 != "-" && $6 == "-" && $8 != "-"' "$chemin_fichier" > donnees_filtrees.csv
+                    awk -F';' -v var1="$identifiant_centrale" '$1 == var1 && $2 == "-" && $3 == "-" && $5 != "-" && $6 == "-" && $8 != "-"' "$chemin_fichier" > tmp/donnees_filtrees.csv
                 else
-                    awk -F';' -v var1="$identifiant_centrale" '$1 == var1 && $2 == "-" && $3 == "-" && $4 != "-" && $8 != "-"' "$chemin_fichier" > donnees_filtrees.csv
+                    awk -F';' -v var1="$identifiant_centrale" '$1 == var1 && $2 == "-" && $3 == "-" && $4 != "-" && $8 != "-"' "$chemin_fichier" > tmp/donnees_filtrees.csv
                 fi
             fi
         fi
     fi
 else
     if [[ "$type_station" == "hvb" ]]; then
-        awk -F';' '$2 != "-" && $3 == "-" && $8 != "-"' "$chemin_fichier" > donnees_filtrees.csv
+        awk -F';' '$2 != "-" && $3 == "-" && $8 != "-"' "$chemin_fichier" > tmp/donnees_filtrees.csv
     else 
         if [[ "$type_station" == "hva" ]]; then
-            awk -F';' '$2 == "-" && $3 != "-" && $8 != "-"' "$chemin_fichier" > donnees_filtrees.csv
+            awk -F';' '$2 == "-" && $3 != "-" && $8 != "-"' "$chemin_fichier" > tmp/donnees_filtrees.csv
         else
             if [[ "$type_station" == "lv" && "$type_consommateur" == "indiv" ]]; then
-                awk -F';' '$2 == "-" && $3 == "-" && $4 != "-" && $5 == "-" && $6 != "-" && $8 != "-"' "$chemin_fichier" > donnees_filtrees.csv
+                awk -F';' '$2 == "-" && $3 == "-" && $4 != "-" && $5 == "-" && $6 != "-" && $8 != "-"' "$chemin_fichier" > tmp/donnees_filtrees.csv
             else    
                 if [[ "$type_station" == "lv" && "$type_consommateur" == "comp" ]]; then
-                    awk -F';' '$2 == "-" && $3 == "-" && $4 != "-" && $5 != "-" && $6 == "-" && $8 != "-"' "$chemin_fichier" > donnees_filtrees.csv
+                    awk -F';' '$2 == "-" && $3 == "-" && $4 != "-" && $5 != "-" && $6 == "-" && $8 != "-"' "$chemin_fichier" > tmp/donnees_filtrees.csv
                 else
-                    awk -F';' '$2 == "-" && $3 == "-" && $4 != "-" && $8 != "-"' "$chemin_fichier" > donnees_filtrees.csv
+                    awk -F';' '$2 == "-" && $3 == "-" && $4 != "-" && $8 != "-"' "$chemin_fichier" > tmp/donnees_filtrees.csv
                 fi
             fi
         fi
@@ -182,9 +195,9 @@ else
 fi
 
 # Ajouter l'en-tête au fichier de sortie
-echo "Power plant;HV-B Station;HV-A Station;LV Station;Company;Individual;Capacity;Load" > temp.csv
-cat donnees_filtrees.csv >> temp.csv
-mv temp.csv donnees_filtrees.csv
+echo "Power plant;HV-B Station;HV-A Station;LV Station;Company;Individual;Capacity;Load" > tmp/temp.csv
+cat tmp/donnees_filtrees.csv >> tmp/temp.csv
+mv temp.csv tmp/donnees_filtrees.csv
 
 # Stocker le temps de fin
 fin1=$(date +%s)
@@ -247,7 +260,7 @@ if [[ "$type_station" == "lv" && "$type_consommateur" == "all" ]]; then
 
     # Ajouter l'en-tête et déplacer le fichier final
     echo "Station:Capacite:Consommation:Difference" > lv_all_minmax.csv
-    cat tmp.csv >> lv_all_minmax.csv
+    cat tmp/tmp.csv >> lv_all_minmax.csv
 
     # Supprimer le fichier temporaire
     rm tmp.csv
