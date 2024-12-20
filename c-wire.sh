@@ -197,7 +197,7 @@ fi
 # Ajouter l'en-tête au fichier de sortie
 echo "Power plant;HV-B Station;HV-A Station;LV Station;Company;Individual;Capacity;Load" > tmp/temp.csv
 cat tmp/donnees_filtrees.csv >> tmp/temp.csv
-mv temp.csv tmp/donnees_filtrees.csv
+mv tmp/temp.csv tmp/donnees_filtrees.csv
 
 # Stocker le temps de fin
 fin1=$(date +%s)
