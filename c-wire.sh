@@ -209,13 +209,13 @@ temps1=$(( fin1 - debut1 ))
 # on verifie si l executable existe sinon on le complile via un makefile
 
 # Nom de l'exécutable à vérifier
-executable="projet_exe"
+executable="codeC/projet_exe"
 
 # Vérifier si l'exécutable existe sinon on le genere
 if [[ ! -f "$executable" ]]; then
     echo "L'exécutable '$executable' n'existe pas ou n'est pas exécutable."
     echo "Lancement de la compilation..."
-    make
+    (cd codeC && make clean && make)
 fi
 
 # Stocker le temps de début dans une variable
@@ -234,10 +234,10 @@ fi
 # on copie les resultats du programme c dans le fichier final
 if [[ -n "$identifiant_centrale" ]]; then
     # Si l'identifiant de centrale est renseigné, on construit un nom de fichier complet
-    fichier_resultat="${type_station}_${type_consommateur}_${identifiant_centrale}.csv"
+    fichier_resultat="codeC/${type_station}_${type_consommateur}_${identifiant_centrale}.csv"
 else
     # Sinon, on construit un nom de fichier sans l'identifiant de centrale
-    fichier_resultat="${type_station}_${type_consommateur}.csv"
+    fichier_resultat="codeC/${type_station}_${type_consommateur}.csv"
 fi
 
 
@@ -263,7 +263,7 @@ if [[ "$type_station" == "lv" && "$type_consommateur" == "all" ]]; then
     cat tmp/tmp.csv >> lv_all_minmax.csv
 
     # Supprimer le fichier temporaire
-    rm tmp.csv
+    rm tmp/tmp.csv
 fi
 
 # Stocker le temps de fin
