@@ -84,7 +84,7 @@ while true; do
     if [[ "$type_consommateur" =~ ^(comp|indiv|all)$ ]]; then   
     # Vérification des combinaisons interdites
         if [[ "$type_station" =~ ^(hvb|hva)$ ]] && [[ "$type_consommateur" =~ ^(all|indiv)$ ]]; then
-            echo "Erreur : Les combinaisons 'hvb all' 'hvb all' 'hva all' et 'hva indiv' sont toutes interdites. Veuillez réessayer"
+            echo "Erreur : Les combinaisons 'hvb all' 'hvb all' 'hva all' et 'hva indiv' sont toutes interdites."
             echo "On va traiter les compagnies uniquement"
             type_consommateur="comp"
             break
@@ -209,7 +209,7 @@ temps1=$(( fin1 - debut1 ))
 # on verifie si l executable existe sinon on le complile via un makefile
 
 # Nom de l'exécutable à vérifier
-executable="codeC/projet_exe"
+executable="projet_exe"
 
 # Vérifier si l'exécutable existe sinon on le genere
 if [[ ! -f "$executable" ]]; then
@@ -225,10 +225,10 @@ debut2=$(date +%s)
 
 if [[ -n "$identifiant_centrale" ]]; then
     # Si l'identifiant de centrale est renseigné, on construit un nom de fichier complet
-    ./"$executable" $type_station $type_consommateur $identifiant_centrale
+    (cd codeC && ./"$executable" $type_station $type_consommateur $identifiant_centrale)
 else
     # Sinon, on construit un nom de fichier sans l'identifiant de centrale
-    ./"$executable" $type_station $type_consommateur
+    (cd codeC && ./"$executable" $type_station $type_consommateur)
 fi
 
 # on copie les resultats du programme c dans le fichier final
@@ -244,10 +244,10 @@ fi
 # On extrait les 10 min et les 10 max dans les cas lv_all par consommation
 if [[ "$type_station" == "lv" && "$type_consommateur" == "all" ]]; then
     # Extraire les 10 valeurs maximales et leurs lignes associées
-    sort -nr -t':' -k3 "$fichier_resultat" | head -n 11 > lv_all_max.csv
+    sort -nr -t':' -k3 "$fichier_resultat" | head -n 10 > lv_all_max.csv
 
     # Extraire les 10 valeurs minimales et leurs lignes associées
-    sort -n -t':' -k3 "$fichier_resultat" | head -n 10 > lv_all_min.csv
+    sort -n -t':' -k3 "$fichier_resultat" | head -n 11 > lv_all_min.csv
 
     # Combiner les deux fichiers en un seul
     cat lv_all_min.csv lv_all_max.csv > lv_all_minmax.csv
@@ -256,7 +256,7 @@ if [[ "$type_station" == "lv" && "$type_consommateur" == "all" ]]; then
     rm lv_all_max.csv lv_all_min.csv
 
     # Trier par quantité d'énergie consommée en trop des 20 lignes
-    sort -n -t':' -k4 lv_all_minmax.csv | head -n 20 > tmp.csv
+    sort -n -t':' -k4 lv_all_minmax.csv | head -n 20 > tmp/tmp.csv
 
     # Ajouter l'en-tête et déplacer le fichier final
     echo "Station:Capacite:Consommation:Difference" > lv_all_minmax.csv
