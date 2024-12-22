@@ -212,7 +212,7 @@ temps1=$(( fin1 - debut1 ))
 executable="projet_exe"
 
 # Vérifier si l'exécutable existe sinon on le genere
-if [[ ! -f "$executable" ]]; then
+if [[ ! -f "codeC/$executable" ]]; then
     echo "L'exécutable '$executable' n'existe pas ou n'est pas exécutable."
     echo "Lancement de la compilation..."
     (cd codeC && make clean && make)
@@ -265,6 +265,9 @@ if [[ "$type_station" == "lv" && "$type_consommateur" == "all" ]]; then
     # Supprimer le fichier temporaire
     rm tmp/tmp.csv
 fi
+
+sort -t':' -k2,2n "$fichier_resultat" > "tmp/fichier_temp"
+mv "tmp/fichier_temp" "$fichier_resultat"
 
 # Stocker le temps de fin
 fin2=$(date +%s)
