@@ -3,7 +3,7 @@ CC = gcc
 CFLAGS = -std=c11 -Iinclude
 
 # Source files and executable
-SRCS = main.c src/fonction.c
+SRCS = src/main.c src/fonction.c
 OBJS = $(SRCS:.c=.o)
 TARGET = projet_exe
 
