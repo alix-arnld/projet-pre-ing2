@@ -298,7 +298,7 @@ void creationfichieranalyse(Arbre *a, char *type, char * consommateur){
 
     if(strcmp(type,"lv")==0){
         if(strcmp(consommateur,"comp")==0){
-            FILE *fichier = fopen("../tests/lv_comp.csv", "w");
+            FILE *fichier = fopen("lv_comp.csv", "w");
             if (fichier == NULL) {
                 exit(4);
             }
